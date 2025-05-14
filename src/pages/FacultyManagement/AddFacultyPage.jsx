@@ -36,7 +36,7 @@ const FacultyRegistrationForm = () => {
     const fetchLastEmployeeId = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/faculty/faculties"
+          "https://backend-erp-faculty.vercel.app/api/faculty/faculties"
         );
         if (!response.ok) {
           throw new Error("Failed to fetch faculty data");
@@ -204,7 +204,7 @@ const FacultyRegistrationForm = () => {
 
       // Send to faculty registration API
       const facultyResponse = await fetch(
-        "http://localhost:5000/api/faculty/register",
+        "https://backend-erp-faculty.vercel.app/api/faculty/register",
         {
           method: "POST",
           headers: {
@@ -229,13 +229,16 @@ const FacultyRegistrationForm = () => {
       };
 
       // Send to salary record API
-      const salaryResponse = await fetch("http://localhost:5000/api/salary", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(salaryData),
-      });
+      const salaryResponse = await fetch(
+        "https://backend-erp-faculty.vercel.app/api/salary",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(salaryData),
+        }
+      );
 
       const salaryDataResponse = await salaryResponse.json();
       if (!salaryResponse.ok) {

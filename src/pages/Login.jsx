@@ -1,45 +1,52 @@
-import React, { useState } from 'react';
-import { User, Lock, Building, BookOpen, School } from 'lucide-react'; // Adjust import if needed
+import React, { useState } from "react";
+import { User, Lock, Building, BookOpen, School } from "lucide-react"; // Adjust import if needed
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role }),
-      });
+      const response = await fetch(
+        "https://backend-erp-faculty.vercel.app/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, role }),
+        }
+      );
 
       const data = await response.json();
-      console.log('Backend Response:', data);
+      console.log("Backend Response:", data);
 
       if (!response.ok) {
-        setError(data.message || 'Login failed. Please check your credentials.');
+        setError(
+          data.message || "Login failed. Please check your credentials."
+        );
       } else if (data.token) {
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem("authToken", data.token);
         if (rememberMe) {
-          localStorage.setItem('userEmail', email);
-          localStorage.setItem('userRole', role);
+          localStorage.setItem("userEmail", email);
+          localStorage.setItem("userRole", role);
         }
-        alert('Login successful');
+        alert("Login successful");
         // Redirect to dashboard or another page
       } else {
-        setError('Unexpected error. Please try again.');
+        setError("Unexpected error. Please try again.");
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError('Unable to connect to the server. Please make sure the backend is running on port 5000.');
+      console.error("Login error:", err);
+      setError(
+        "Unable to connect to the server. Please make sure the backend is running on port 5000."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -47,13 +54,13 @@ const Login = () => {
 
   const getRoleIcon = () => {
     switch (role) {
-      case 'director':
+      case "director":
         return <Building className="h-6 w-6 text-blue-600" />;
-      case 'faculty-management':
+      case "faculty-management":
         return <BookOpen className="h-6 w-6 text-blue-600" />;
-      case 'faculty':
+      case "faculty":
         return <School className="h-6 w-6 text-blue-600" />;
-      case 'student':
+      case "student":
         return <User className="h-6 w-6 text-blue-600" />;
       default:
         return <User className="h-6 w-6 text-blue-600" />;
@@ -67,7 +74,9 @@ const Login = () => {
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
             {getRoleIcon()}
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Welcome Back</h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+            Welcome Back
+          </h2>
           <p className="mt-2 text-sm text-gray-600">Sign in to your account</p>
         </div>
 
@@ -144,10 +153,10 @@ const Login = () => {
               type="submit"
               disabled={isLoading}
               className={`w-full flex justify-center py-3 px-4 text-sm font-medium rounded-lg text-white ${
-                isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                isLoading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>

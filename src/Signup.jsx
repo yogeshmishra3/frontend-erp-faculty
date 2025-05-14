@@ -1,81 +1,84 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('teaching');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [employeeId, setEmployeeId] = useState('');
-  const [gender, setGender] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [address, setAddress] = useState('');
-  const [aadhaar, setAadhaar] = useState('');
-  const [department, setDepartment] = useState('');
-  const [designation, setDesignation] = useState('');
-  const [dateOfJoining, setDateOfJoining] = useState('');
-  const [employmentType, setEmploymentType] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("teaching");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [employeeId, setEmployeeId] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [address, setAddress] = useState("");
+  const [aadhaar, setAadhaar] = useState("");
+  const [department, setDepartment] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [dateOfJoining, setDateOfJoining] = useState("");
+  const [employmentType, setEmploymentType] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          role,
-          firstName,
-          lastName,
-          employeeId,
-          gender,
-          dateOfBirth,
-          mobile,
-          address,
-          aadhaar,
-          department,
-          designation,
-          dateOfJoining,
-          employmentType,
-        }),
-      });
+      const response = await fetch(
+        "https://backend-erp-faculty.vercel.app/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            role,
+            firstName,
+            lastName,
+            employeeId,
+            gender,
+            dateOfBirth,
+            mobile,
+            address,
+            aadhaar,
+            department,
+            designation,
+            dateOfJoining,
+            employmentType,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'Registration failed');
+        setError(data.message || "Registration failed");
       } else {
-        alert('Registration successful! Please login.');
-        navigate('/login');
+        alert("Registration successful! Please login.");
+        navigate("/login");
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      setError('Server error. Please try again.');
+      console.error("Signup error:", err);
+      setError("Server error. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
+    <div style={{ maxWidth: "400px", margin: "auto", padding: "20px" }}>
       <h2 className="text-2xl font-bold mb-6 text-center">Signup</h2>
       <form onSubmit={handleSignup}>
         <div className="mb-4">
@@ -281,7 +284,7 @@ const Signup = () => {
           }`}
           disabled={isLoading}
         >
-          {isLoading ? 'Signing up...' : 'Sign Up'}
+          {isLoading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
     </div>

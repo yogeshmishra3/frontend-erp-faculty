@@ -25,7 +25,7 @@ const ApplyLeave = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/leave/apply",
+        "https://backend-erp-faculty.vercel.app/api/leave/apply",
         formData
       );
       setMessage(response.data.message);

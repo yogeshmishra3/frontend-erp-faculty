@@ -16,7 +16,7 @@ const ApproveLeave = () => {
     const fetchLeaves = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/leave/hod/${encodeURIComponent(
+          `https://backend-erp-faculty.vercel.app/api/leave/hod/${encodeURIComponent(
             department
           )}`
         );
@@ -34,7 +34,7 @@ const ApproveLeave = () => {
     e.preventDefault();
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/leave/hod/${decision.leaveId}`,
+        `https://backend-erp-faculty.vercel.app/api/leave/hod/${decision.leaveId}`,
         {
           hodEmployeeId,
           decision: decision.decision,

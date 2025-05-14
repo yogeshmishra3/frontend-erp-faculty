@@ -1,46 +1,49 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const navigate = useNavigate();
-  
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('student');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("student");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, role }),
-      });
+      const response = await fetch(
+        "https://backend-erp-faculty.vercel.app/api/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password, role }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || 'Registration failed');
+        setError(data.message || "Registration failed");
       } else {
-        alert('Registration successful! Please login.');
-        navigate('/'); // redirect to login
+        alert("Registration successful! Please login.");
+        navigate("/"); // redirect to login
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      setError('Server error. Please try again.');
+      console.error("Signup error:", err);
+      setError("Server error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -50,9 +53,12 @@ const Signup = () => {
     <div className="flex items-center justify-center">
       <div className="w-full max-w-md p-8 bg-white rounded shadow">
         <h2 className="text-2xl font-bold text-center mb-6">Register here</h2>
-        
 
-        {error && <div className="bg-red-100 p-2 text-red-700 mb-4 rounded">{error}</div>}
+        {error && (
+          <div className="bg-red-100 p-2 text-red-700 mb-4 rounded">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSignup} className="space-y-4">
           <input
@@ -107,7 +113,7 @@ const Signup = () => {
             disabled={isLoading}
             className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
           >
-            {isLoading ? 'Signing up...' : 'Sign Up'}
+            {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
       </div>

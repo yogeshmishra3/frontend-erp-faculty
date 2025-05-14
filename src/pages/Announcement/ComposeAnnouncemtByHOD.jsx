@@ -13,13 +13,7 @@ const AnnouncementForm = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const roles = [
-    "student",
-    "teaching_staff",
-    "non_teaching_staff",
-    "hod",
-   
-  ];
+  const roles = ["student", "teaching_staff", "non_teaching_staff", "hod"];
 
   // STATIC ROLE for now - make dynamic in production
   const currentDashboard = "hod";
@@ -45,7 +39,10 @@ const AnnouncementForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/announcements", formData);
+      await axios.post(
+        "https://backend-erp-faculty.vercel.app/api/announcements",
+        formData
+      );
       alert("Announcement Created Successfully");
       setFormData({
         title: "",
@@ -64,7 +61,7 @@ const AnnouncementForm = () => {
   const fetchAnnouncements = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/announcements/${currentDashboard}`
+        `https://backend-erp-faculty.vercel.app/api/announcements/${currentDashboard}`
       );
       setAnnouncements(res.data); // Already sorted from backend
       setLoading(false);

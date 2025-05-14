@@ -20,7 +20,9 @@ export const SalaryRecords = () => {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/salary");
+        const response = await axios.get(
+          "https://backend-erp-faculty.vercel.app/api/salary"
+        );
         setRecords(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch records");
@@ -39,7 +41,7 @@ export const SalaryRecords = () => {
         setDetailLoading(true);
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/salary/${selectedEmployeeId}`
+            `https://backend-erp-faculty.vercel.app/api/salary/${selectedEmployeeId}`
           );
           setSelectedRecord(response.data);
           setEditFormData(response.data); // Initialize edit form with current data
@@ -118,7 +120,7 @@ export const SalaryRecords = () => {
       setUpdateSuccess("");
 
       const response = await axios.put(
-        `http://localhost:5000/api/salary/${selectedEmployeeId}`,
+        `https://backend-erp-faculty.vercel.app/api/salary/${selectedEmployeeId}`,
         editFormData
       );
 

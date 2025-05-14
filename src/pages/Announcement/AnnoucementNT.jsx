@@ -9,7 +9,7 @@ const NonTeachingAnnouncements = () => {
   const fetchAnnouncements = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/announcements/non_teaching_staff`
+        `https://backend-erp-faculty.vercel.app/api/announcements/non_teaching_staff`
       );
       setAnnouncements(res.data.reverse()); // latest first
     } catch (err) {

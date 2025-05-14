@@ -14,13 +14,16 @@ const Login = ({ onLogin = () => {} }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ employeeId, password }),
-      });
+      const response = await fetch(
+        "https://backend-erp-faculty.vercel.app/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ employeeId, password }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -133,7 +136,6 @@ const Login = ({ onLogin = () => {} }) => {
                 onFocus={() => setActiveField("employeeId")}
                 onBlur={() => setActiveField("")}
                 className="appearance-none block w-full pl-10 pr-3 py-3 border-2 border-indigo-300/50 bg-white/10 backdrop-filter backdrop-blur-sm text-white rounded-xl placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-              
                 disabled={isLoading}
               />
               <label
