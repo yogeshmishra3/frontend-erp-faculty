@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 const FacultyRegistrationForm = () => {
   const [formData, setFormData] = useState({
-    employeeId: "", // Will be generated based on faculty type
+    employeeId: "",
     name: "",
     email: "",
     gender: "",
@@ -17,7 +17,7 @@ const FacultyRegistrationForm = () => {
     status: "Active",
     type: "teaching",
     teachingExperience: "",
-    subjectsTaught: "",
+    subjectsTaught: [],
     classIncharge: "",
     researchPublications: "",
     technicalSkills: "",
@@ -28,74 +28,155 @@ const FacultyRegistrationForm = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [lastEmployeeId, setLastEmployeeId] = useState(null);
-  const [fetching, setFetching] = useState(true);
+  const [counterValues, setCounterValues] = useState({
+    teaching: 1,
+    nonTeaching: 1,
+  });
+  const [selectedSubject, setSelectedSubject] = useState("");
 
-  // Fetch the last employee ID when component mounts
-  useEffect(() => {
-    const fetchLastEmployeeId = async () => {
-      try {
-        const response = await fetch(
-          "https://backend-erp-faculty.vercel.app/api/faculty/faculties"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch faculty data");
-        }
-        const data = await response.json();
+  // Subject lists for each department
+  const departmentSubjects = {
+    "Computer Science": [
+      "Data Structures and Algorithms",
+      "Operating Systems",
+      "Computer Networks",
+      "Database Management Systems",
+      "Software Engineering",
+      "Theory of Computation",
+      "Compiler Design",
+      "Artificial Intelligence",
+      "Machine Learning",
+      "Computer Architecture",
+      "Web Technologies",
+      "Cloud Computing",
+      "Cyber Security",
+    ],
+    "Information Technology": [
+      "Data Structures",
+      "Computer Networks",
+      "Database Management Systems",
+      "Software Engineering",
+      "Information Security",
+      "Web Technologies",
+      "Operating Systems",
+      "Object-Oriented Programming",
+      "Mobile Computing",
+      "E-Commerce and ERP",
+      "Data Mining",
+      "Cloud Computing",
+    ],
+    Electronics: [
+      "Electronic Devices and Circuits",
+      "Digital Electronics",
+      "Signals and Systems",
+      "Analog Circuits",
+      "Microprocessors and Microcontrollers",
+      "Communication Systems",
+      "VLSI Design",
+      "Embedded Systems",
+      "Control Systems",
+      "Antenna and Wave Propagation",
+      "Wireless Communication",
+      "Image Processing",
+    ],
+    Mechanical: [
+      "Engineering Mechanics",
+      "Thermodynamics",
+      "Fluid Mechanics",
+      "Strength of Materials",
+      "Manufacturing Processes",
+      "Machine Design",
+      "Heat and Mass Transfer",
+      "Theory of Machines",
+      "CAD/CAM",
+      "Automobile Engineering",
+      "Robotics",
+      "Industrial Engineering",
+    ],
+    Civil: [
+      "Engineering Mechanics",
+      "Surveying",
+      "Strength of Materials",
+      "Fluid Mechanics",
+      "Structural Analysis",
+      "Concrete Technology",
+      "Soil Mechanics",
+      "Transportation Engineering",
+      "Environmental Engineering",
+      "Construction Planning and Management",
+      "Water Resources Engineering",
+      "Estimation and Costing",
+    ],
+    Electrical: [
+      "Electrical Circuits",
+      "Electromagnetic Fields",
+      "Electrical Machines",
+      "Power Systems",
+      "Control Systems",
+      "Power Electronics",
+      "Electrical Measurements",
+      "Switchgear and Protection",
+      "Renewable Energy Systems",
+      "High Voltage Engineering",
+      "Microprocessors and Applications",
+      "Electric Drives",
+    ],
+    "Data Science": [
+      "Statistics for Data Science",
+      "Python and R Programming",
+      "Data Structures",
+      "Data Visualization",
+      "Machine Learning",
+      "Deep Learning",
+      "Big Data Analytics",
+      "Data Mining",
+      "Artificial Intelligence",
+      "Natural Language Processing",
+      "Cloud Computing for Data Science",
+      "Business Analytics",
+      "Data Ethics and Governance",
+      "Database Management Systems",
+      "Time Series Analysis",
+    ],
+  };
 
-        if (data.length > 0) {
-          // Find the highest employee ID
-          const lastId = data.reduce((max, faculty) => {
-            const currentId = parseInt(faculty.employeeId.replace(/\D/g, ""));
-            return currentId > max ? currentId : max;
-          }, 0);
-
-          setLastEmployeeId(lastId);
-        } else {
-          setLastEmployeeId(0); // No faculty records yet
-        }
-      } catch (error) {
-        console.error("Error fetching faculty data:", error);
-        setErrors({ server: "Failed to load faculty data. Please refresh." });
-      } finally {
-        setFetching(false);
-      }
-    };
-
-    fetchLastEmployeeId();
-  }, []);
-
-  // Generate employee ID based on faculty type and last ID
   const generateEmployeeId = (type) => {
-    if (fetching) return "Loading...";
-
-    let prefix = "NC"; // College prefix
-    let departmentCode = type === "non-teaching" ? "NT" : "AT"; // Department code
-
-    // Start from last ID + 1 or 1001 if no records exist
-    const nextId = (lastEmployeeId || 1000) + 1;
-
-    // Format the ID with leading zeros (4 digits)
-    const number = nextId.toString().padStart(4, "0");
-
-    // Construct the employee ID
+    let prefix = "NC";
+    let departmentCode = type === "non-teaching" ? "NT" : "AT";
+    let counterId = type === "non-teaching" ? "nonTeaching" : "teaching";
+    const number = (1000 + counterValues[counterId]).toString().substring(1);
     return `${prefix}${departmentCode}${number}`;
   };
 
-  // Update employee ID whenever type changes
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
       employeeId: generateEmployeeId(prevData.type),
     }));
-  }, [formData.type, lastEmployeeId, fetching]);
+  }, [formData.type, counterValues]);
+
+  useEffect(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      employeeId: generateEmployeeId(prevData.type),
+    }));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    if (name === "department") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        subjectsTaught: [], // Reset subjectsTaught when department changes
+      });
+      setSelectedSubject(""); // Reset selectedSubject when department changes
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleArrayInput = (e) => {
@@ -106,22 +187,37 @@ const FacultyRegistrationForm = () => {
     });
   };
 
+  const handleSingleSubjectChange = (e) => {
+    setSelectedSubject(e.target.value);
+  };
+
+  const addSingleSubject = () => {
+    if (selectedSubject && !formData.subjectsTaught.includes(selectedSubject)) {
+      setFormData({
+        ...formData,
+        subjectsTaught: [...formData.subjectsTaught, selectedSubject],
+      });
+      setSelectedSubject("");
+    }
+  };
+
   const handleTypeChange = (type) => {
     setFormData((prevData) => ({
       ...prevData,
       type: type,
-      // Reset type-specific fields when switching types
       teachingExperience:
         type === "teaching" ? prevData.teachingExperience : "",
-      subjectsTaught: type === "teaching" ? prevData.subjectsTaught : "",
+      subjectsTaught: type === "teaching" ? prevData.subjectsTaught : [],
       classIncharge: type === "teaching" ? prevData.classIncharge : "",
       researchPublications:
         type === "teaching" ? prevData.researchPublications : "",
     }));
+    setSelectedSubject("");
   };
 
   const validateForm = () => {
     const newErrors = {};
+
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -139,7 +235,14 @@ const FacultyRegistrationForm = () => {
       newErrors.aadhaar = "Aadhaar number must be 12 digits";
     }
 
-    // Common required fields for both teaching and non-teaching
+    if (formData.dateOfBirth && formData.dateOfJoining) {
+      const dob = new Date(formData.dateOfBirth);
+      const doj = new Date(formData.dateOfJoining);
+      if (dob >= doj) {
+        newErrors.dateOfBirth = "Date of Birth must be before Date of Joining";
+      }
+    }
+
     const requiredFields = [
       "gender",
       "designation",
@@ -153,9 +256,19 @@ const FacultyRegistrationForm = () => {
       "shiftTiming",
     ];
 
-    // Only add teaching-specific required fields when type is teaching
     if (formData.type === "teaching") {
       requiredFields.push("teachingExperience", "classIncharge");
+      if (formData.teachingExperience && formData.workExperience) {
+        const teachingExp = parseFloat(formData.teachingExperience);
+        const workExp = parseFloat(formData.workExperience);
+        if (isNaN(teachingExp) || isNaN(workExp)) {
+          newErrors.teachingExperience =
+            "Teaching and Work Experience must be valid numbers";
+        } else if (teachingExp > workExp) {
+          newErrors.teachingExperience =
+            "Teaching Experience cannot exceed Work Experience";
+        }
+      }
     }
 
     requiredFields.forEach((field) => {
@@ -182,14 +295,9 @@ const FacultyRegistrationForm = () => {
     setErrors({});
 
     try {
-      // Prepare data for faculty API
       const dataToSubmit = {
         ...formData,
-        subjectsTaught: Array.isArray(formData.subjectsTaught)
-          ? formData.subjectsTaught
-          : formData.subjectsTaught
-          ? formData.subjectsTaught.split(",").map((item) => item.trim())
-          : [],
+        subjectsTaught: formData.subjectsTaught,
         researchPublications: Array.isArray(formData.researchPublications)
           ? formData.researchPublications
           : formData.researchPublications
@@ -202,7 +310,6 @@ const FacultyRegistrationForm = () => {
           : [],
       };
 
-      // Send to faculty registration API
       const facultyResponse = await fetch(
         "https://backend-erp-faculty.vercel.app/api/faculty/register",
         {
@@ -219,7 +326,6 @@ const FacultyRegistrationForm = () => {
         throw new Error(facultyData.message || "Faculty registration failed");
       }
 
-      // Prepare data for salary API (only required fields)
       const salaryData = {
         employeeId: formData.employeeId,
         name: formData.name,
@@ -228,7 +334,6 @@ const FacultyRegistrationForm = () => {
         type: formData.type,
       };
 
-      // Send to salary record API
       const salaryResponse = await fetch(
         "https://backend-erp-faculty.vercel.app/api/salary",
         {
@@ -247,12 +352,17 @@ const FacultyRegistrationForm = () => {
         );
       }
 
-      // Show success message
-      setSuccess(true);
+      const currentType = formData.type;
+      const counterId =
+        currentType === "non-teaching" ? "nonTeaching" : "teaching";
+      setCounterValues((prev) => ({
+        ...prev,
+        [counterId]: prev[counterId] + 1,
+      }));
 
-      // Reset form data but keep type
+      setSuccess(true);
       setFormData({
-        employeeId: generateEmployeeId(formData.type), // Generate new ID immediately
+        employeeId: generateEmployeeId(currentType),
         name: "",
         email: "",
         gender: "",
@@ -265,9 +375,9 @@ const FacultyRegistrationForm = () => {
         aadhaar: "",
         employmentType: "",
         status: "Active",
-        type: formData.type, // Preserve the current type
+        type: currentType,
         teachingExperience: "",
-        subjectsTaught: "",
+        subjectsTaught: [],
         classIncharge: "",
         researchPublications: "",
         technicalSkills: "",
@@ -275,10 +385,7 @@ const FacultyRegistrationForm = () => {
         reportingOfficer: "",
         shiftTiming: "",
       });
-
-      // Update the last employee ID
-      const currentIdNum = parseInt(formData.employeeId.replace(/\D/g, ""));
-      setLastEmployeeId(currentIdNum);
+      setSelectedSubject("");
 
       setTimeout(() => {
         setSuccess(false);
@@ -295,7 +402,6 @@ const FacultyRegistrationForm = () => {
     }
   };
 
-  // Department and designation options
   const departments = [
     "Computer Science",
     "Information Technology",
@@ -303,6 +409,7 @@ const FacultyRegistrationForm = () => {
     "Mechanical",
     "Civil",
     "Electrical",
+    "Data Science",
   ];
 
   const teachingDesignations = [
@@ -393,7 +500,6 @@ const FacultyRegistrationForm = () => {
       )}
 
       <form onSubmit={handleSubmit}>
-        {/* Faculty Type Selection */}
         <div className="mb-4 flex justify-center">
           <div className="inline-flex rounded-md shadow-sm" role="group">
             <button
@@ -421,7 +527,6 @@ const FacultyRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Employee ID Display */}
         <div className="mb-4 bg-blue-50 p-3 rounded-md">
           <label className="block text-xs font-medium text-blue-700 mb-1">
             Employee ID (Auto-generated)
@@ -431,7 +536,6 @@ const FacultyRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Section 1: Personal Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -566,7 +670,6 @@ const FacultyRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Section 2: Employment Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -742,7 +845,6 @@ const FacultyRegistrationForm = () => {
           </div>
         </div>
 
-        {/* Section 3: Teaching Information - Only for teaching faculty */}
         {formData.type === "teaching" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div>
@@ -750,7 +852,7 @@ const FacultyRegistrationForm = () => {
                 Teaching Experience (Years) *
               </label>
               <input
-                type="text"
+                type="number"
                 name="teachingExperience"
                 value={formData.teachingExperience}
                 onChange={handleChange}
@@ -790,16 +892,44 @@ const FacultyRegistrationForm = () => {
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">
-                Subjects Taught
+                Add Subject
               </label>
-              <input
-                type="text"
-                name="subjectsTaught"
-                value={formData.subjectsTaught}
-                onChange={handleArrayInput}
-                placeholder="e.g., Database, Programming, Networks"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              />
+              <div className="flex gap-2">
+                <select
+                  value={selectedSubject}
+                  onChange={handleSingleSubjectChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                >
+                  <option value="">Select a subject</option>
+                  {(departmentSubjects[formData.department] || []).map(
+                    (subject, index) => (
+                      <option key={index} value={subject}>
+                        {subject}
+                      </option>
+                    )
+                  )}
+                </select>
+                <button
+                  type="button"
+                  onClick={addSingleSubject}
+                  disabled={!selectedSubject}
+                  className="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Add
+                </button>
+              </div>
+              {formData.subjectsTaught.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs font-medium text-gray-700">
+                    Selected Subjects:
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-gray-600">
+                    {formData.subjectsTaught.map((subject, index) => (
+                      <li key={index}>{subject}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             <div className="md:col-span-2 lg:col-span-3">
@@ -818,18 +948,13 @@ const FacultyRegistrationForm = () => {
           </div>
         )}
 
-        {/* Submit Button */}
         <div className="flex justify-end mt-6 border-t pt-4">
           <button
             type="submit"
-            disabled={loading || fetching}
+            disabled={loading}
             className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
           >
-            {fetching
-              ? "Loading data..."
-              : loading
-              ? "Submitting..."
-              : "Register Faculty"}
+            {loading ? "Submitting..." : "Register Faculty"}
           </button>
         </div>
       </form>

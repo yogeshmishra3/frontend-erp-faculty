@@ -8,6 +8,36 @@ export default function LeaveApplicationForm() {
   const [contact, setContact] = useState("");
   const [reason, setReason] = useState("");
   const [fileName, setFileName] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to midnight for date-only comparison
+
+    if (!leaveType) newErrors.leaveType = "Leave Type is required";
+    if (!startDate) newErrors.startDate = "Start Date is required";
+    if (!endDate) newErrors.endDate = "End Date is required";
+    if (!contact) newErrors.contact = "Contact is required";
+    if (!reason) newErrors.reason = "Reason is required";
+
+    if (startDate) {
+      const start = new Date(startDate);
+      if (start < today) {
+        newErrors.startDate = "Start Date cannot be before today";
+      }
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (start >= end) {
+        newErrors.date = "Start Date must be before End Date";
+      }
+    }
+
+    return newErrors;
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
@@ -20,22 +50,27 @@ export default function LeaveApplicationForm() {
   };
 
   const handleCancel = () => {
-    // Reset form fields
+    // Reset form fields and errors
     setLeaveType("");
     setStartDate("");
     setEndDate("");
     setContact("");
     setReason("");
     setFileName("");
+    setErrors({});
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Validation check
-    if (!leaveType || !startDate || !endDate || !contact || !reason) {
-      alert("Please fill in all the required fields.");
+    const formErrors = validateForm();
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
       return;
     }
+
+    // Clear errors and proceed with submission
+    setErrors({});
 
     // You can add logic here to submit the form data (e.g., send to an API)
 
@@ -62,7 +97,9 @@ export default function LeaveApplicationForm() {
                 <select
                   value={leaveType}
                   onChange={(e) => setLeaveType(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={`appearance-none bg-white border ${
+                    errors.leaveType ? "border-red-500" : "border-gray-300"
+                  } rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                 >
                   <option value="">Select leave type</option>
                   <option value="casual">Casual Leave</option>
@@ -74,6 +111,9 @@ export default function LeaveApplicationForm() {
                   <ArrowRight className="h-4 w-4 rotate-90" />
                 </div>
               </div>
+              {errors.leaveType && (
+                <p className="mt-1 text-xs text-red-500">{errors.leaveType}</p>
+              )}
             </div>
 
             <div>
@@ -85,12 +125,20 @@ export default function LeaveApplicationForm() {
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={`appearance-none bg-white border ${
+                    errors.startDate || errors.date ? "border-red-500" : "border-gray-300"
+                  } rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                 />
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <Calendar className="h-4 w-4" />
                 </div>
               </div>
+              {errors.startDate && (
+                <p className="mt-1 text-xs text-red-500">{errors.startDate}</p>
+              )}
+              {errors.date && (
+                <p className="mt-1 text-xs text-red-500">{errors.date}</p>
+              )}
             </div>
 
             <div>
@@ -102,12 +150,17 @@ export default function LeaveApplicationForm() {
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className={`appearance-none bg-white border ${
+                    errors.endDate || errors.date ? "border-red-500" : "border-gray-300"
+                  } rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                 />
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <Calendar className="h-4 w-4" />
                 </div>
               </div>
+              {errors.endDate && (
+                <p className="mt-1 text-xs text-red-500">{errors.endDate}</p>
+              )}
             </div>
 
             <div>
@@ -119,8 +172,13 @@ export default function LeaveApplicationForm() {
                 placeholder="Phone number or email"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`appearance-none bg-white border ${
+                  errors.contact ? "border-red-500" : "border-gray-300"
+                } rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
               />
+              {errors.contact && (
+                <p className="mt-1 text-xs text-red-500">{errors.contact}</p>
+              )}
             </div>
           </div>
 
@@ -133,8 +191,13 @@ export default function LeaveApplicationForm() {
               placeholder="Please provide details about your leave request"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className={`appearance-none bg-white border ${
+                errors.reason ? "border-red-500" : "border-gray-300"
+              } rounded-md w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
             />
+            {errors.reason && (
+              <p className="mt-1 text-xs text-red-500">{errors.reason}</p>
+            )}
           </div>
 
           <div className="mt-6">
